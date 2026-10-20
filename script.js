@@ -19,8 +19,32 @@ function moveButton() {
   const button = sneakyButton.getBoundingClientRect();
   const maxX = Math.max(0, area.width - button.width);
   const maxY = Math.max(0, area.height - button.height);
-  sneakyButton.style.left = `${Math.random() * maxX}px`;
-  sneakyButton.style.top = `${Math.random() * maxY}px`;
+  const currentX = button.left - area.left;
+  const currentY = button.top - area.top;
+  const minJump = Math.min(80, Math.hypot(maxX, maxY) * 0.45);
+  let nextX = currentX;
+  let nextY = currentY;
+  let foundJump = false;
+
+  for (let i = 0; i < 30; i += 1) {
+    nextX = Math.random() * maxX;
+    nextY = Math.random() * maxY;
+    if (Math.hypot(nextX - currentX, nextY - currentY) >= minJump) {
+      foundJump = true;
+      break;
+    }
+  }
+
+  if (!foundJump) {
+    const corners = [[0, 0], [maxX, 0], [0, maxY], [maxX, maxY]];
+    [nextX, nextY] = corners.reduce((farthest, point) =>
+      Math.hypot(point[0] - currentX, point[1] - currentY) >
+      Math.hypot(farthest[0] - currentX, farthest[1] - currentY) ? point : farthest
+    );
+  }
+
+  sneakyButton.style.left = `${nextX}px`;
+  sneakyButton.style.top = `${nextY}px`;
   sneakyButton.style.transform = 'none';
 
   const messages = [
